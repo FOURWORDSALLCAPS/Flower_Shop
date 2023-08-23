@@ -29,3 +29,15 @@ def view_order(request):
 
 def view_order_step(request):
     return render(request, template_name='order-step.html')
+
+
+def view_quiz(request):
+    return render(request, template_name='quiz.html')
+
+
+def view_quiz_step(request):
+    return render(request, template_name='quiz-step.html')
+
+
+def view_result(request):
+    return render(request, template_name='result.html')

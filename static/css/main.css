@@ -474,11 +474,18 @@ margin-bottom: 30px;
 	height: 8px;
 	position: relative;
 }
-.quiz__progress_lineActive {;
+.quiz__progress_lineActive_1 {;
 	position: absolute;
 	background: #17CF97;
 	border-radius: 10px;
-	width: 8px;
+	width: 50%;
+	height: 8px;
+}
+.quiz__progress_lineActive_2 {;
+	position: absolute;
+	background: #17CF97;
+	border-radius: 10px;
+	width: 100%;
 	height: 8px;
 }
 
