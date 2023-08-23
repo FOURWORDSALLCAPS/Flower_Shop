@@ -21,3 +21,11 @@ def view_catalog(request):
 
 def view_consultation(request):
     return render(request, template_name='consultation.html')
+
+
+def view_order(request):
+    return render(request, template_name='order.html')
+
+
+def view_order_step(request):
+    return render(request, template_name='order-step.html')
