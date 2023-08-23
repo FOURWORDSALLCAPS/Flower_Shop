@@ -17,3 +17,7 @@ def view_catalog(request):
     return render(request, template_name='catalog.html', context={
         'catalog_items': catalog_items
     })
+
+
+def view_consultation(request):
+    return render(request, template_name='consultation.html')
