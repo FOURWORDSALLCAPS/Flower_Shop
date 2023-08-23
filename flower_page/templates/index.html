@@ -15,7 +15,7 @@
 					<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 					<nav>
 						<ul class="menu ficc">
-							<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+							<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
 							<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 							<li class="menu__item"><a href="#contacts" class="menu__item_link">Контакты</a></li>
 						</ul>
@@ -37,32 +37,21 @@
 		</section>
 	</div>
 	<section id="recommended">
-		<div class="container">
-			<div class="recommended p100">
-				<div class="title">Рекомендуем</div>
-				<div class="recommended__elems ficb">
-					<div class="recommended__block recommended__block_first">
-						<div class="recommended__block_elems ficb">
-							<span class="recommended__block_intro">Летнее утро</span>
-							<span class="recommended__block_price">3 600 руб</span>
-						</div>
-					</div>
-					<div class="recommended__block recommended__block_sec">
-						<div class="recommended__block_elems ficb">
-							<span class="recommended__block_intro">Зимняя сказка</span>
-							<span class="recommended__block_price">4 100 руб</span>
-						</div>
-					</div>
-					<div class="recommended__block recommended__block_thr">
-						<div class="recommended__block_elems ficb">
-							<span class="recommended__block_intro">Нежный</span>
-							<span class="recommended__block_price">2 900 руб</span>
-						</div>
-					</div>
-				</div>
-				<button class="btn recommended__btn">Показать всю коллекцию</button>
+	  <div class="container">
+		<div class="recommended p100">
+		  <div class="title">Рекомендуем</div>
+		  <div class="recommended__elms ficb">
+			{% for item in recommendation_items %}
+			<div class="recommended__block_elms ficb">
+			  <span class="recommended__block_intro">{{ item.title }}</span>
+			  <span class="recommended__block_price">{{ item.price }} руб</span>
+			  <img src="{{ item.image.url }}" alt="{{ item.title }}" class="recommended__block_img">
 			</div>
+			{% endfor %}
+		  </div>
+		  <button class="btn recommended__btn" onclick="window.location.href='/catalog'">Показать всю коллекцию</button>
 		</div>
+	  </div>
 	</section>
 	<section id="contacts">
 		<div class="container">
@@ -83,10 +72,10 @@
 							<a href="tel:89113966682" class="contacts__block_tel">8 (911) 39 66 682</a>
 						</div>
 					</div>
-					<img src="{% static 'img/contactsImg.jpg' %}" alt="contactsImg" class="contacts__img">
+					<img src="{% static 'img/contactsImg.jpg' %}" alt="contactsImg" class="contacts__img" width="415" height="315">
 					<div class="contacts__map">
 						<script type="text/javascript" charset="utf-8" async src="https://api-maps.yandex.ru/services/constructor/1.0/js/?um=constructor%3Af39d7a7f1829359b6ffe21ab6356fcaeace17d528d6522dba8772f885c8b1a7d&amp;width=398&amp;height=316&amp;lang=ru_RU&amp;scroll=true"></script>
-					</div>					
+					</div>
 				</div>
 				<button class="btn contacts__btn">Заказать доставку</button>
 			</div>
@@ -110,7 +99,7 @@
 				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
-						<li class="menu__item"><a href="#" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
 						<li class="menu__item"><a href="#" class="menu__item_link">Рекомендации</a></li>
 						<li class="menu__item"><a href="#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
