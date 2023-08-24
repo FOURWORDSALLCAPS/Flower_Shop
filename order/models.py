@@ -1,6 +1,6 @@
 from datetime import datetime
 from phonenumber_field.modelfields import PhoneNumberField
-from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
+from django.core.validators import MinValueValidator
 from django.utils import timezone
 from django.db import models
 
@@ -89,33 +89,19 @@ class Consultation(models.Model):
         verbose_name_plural = 'консультации'
 
 
-class Payment(models.Model):
-    cvc_validator = RegexValidator(r'^\d{3}$', "CVC должен состоять из 3 цифр.")
-    card_number = models.IntegerField('Номер карты')
-    cardholder = models.CharField('Имя владельца', max_length=50)
-    month = models.PositiveSmallIntegerField(
-        'Месяц',
-        validators=[
-            MaxValueValidator(12),
-            MinValueValidator(1)
-        ])
-    year = models.PositiveIntegerField('Год', validators=[year_validator])
-    cvc = models.CharField('CVC', max_length=3, validators=[cvc_validator])
-    email = models.EmailField('Email', max_length=50, blank=True)
-
-
 class Order(models.Model):
     TIME_CHOICES = (
-        ('1', 'Как можно скорее'),
-        ('2', 'с 10:00 до 12:00'),
-        ('3', 'с 12:00 до 14:00'),
-        ('4', 'с 14:00 до 16:00'),
-        ('5', 'с 16:00 до 18:00'),
-        ('6', 'c 18:00 до 20:00'),
+        ('Как можно скорее', 'Как можно скорее'),
+        ('с 10:00 до 12:00', 'с 10:00 до 12:00'),
+        ('с 12:00 до 14:00', 'с 12:00 до 14:00'),
+        ('с 14:00 до 16:00', 'с 14:00 до 16:00'),
+        ('с 16:00 до 18:00', 'с 16:00 до 18:00'),
+        ('с 18:00 до 20:00', 'с 18:00 до 20:00'),
     )
 
     class ChoicesStatus(models.TextChoices):
         NEW = 'Новый', 'Новый'
+        Paid = 'Оплачено', 'Оплачено'
         DELIVERED = 'Доставляется', 'Доставляется'
         ACCEPT = 'Доставлен', 'Доставлен'
 
@@ -125,7 +111,6 @@ class Order(models.Model):
     address = models.TextField('Адрес', max_length=100)
     delivery_time = models.CharField('Время доставки', max_length=50, choices=TIME_CHOICES)
     status = models.CharField('Статус заказа', max_length=50, choices=ChoicesStatus.choices, default=ChoicesStatus.NEW, db_index=True)
-    payment = models.ForeignKey(Payment, verbose_name='Оплата', related_name='payments', on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Заказ'
