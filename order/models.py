@@ -29,7 +29,7 @@ class CatalogFlower(models.Model):
     description = models.TextField('Описание')
     image = models.ImageField('Изображение')
     category = models.ManyToManyField('Category', verbose_name='Категория')
-    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2, db_index=True, validators=[MinValueValidator(0)])
 
     class Meta:
         verbose_name = 'букет'

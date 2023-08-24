@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import CatalogFlower, Client, Category, Florist, Consultation, Order, Payment
+from .models import CatalogFlower, Client, Category, Florist, Consultation, Order
 
 
 @admin.register(CatalogFlower)
@@ -101,8 +101,3 @@ class OrderAdmin(admin.ModelAdmin):
             return obj.flower.price
 
     get_total_price.short_description = 'Итоговая стоимость'
-
-
-@admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    pass
