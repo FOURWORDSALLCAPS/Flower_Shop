@@ -41,3 +41,10 @@ def view_quiz_step(request):
 
 def view_result(request):
     return render(request, template_name='result.html')
+
+
+def view_card(request, card_id):
+    card_item = CatalogFlower.objects.filter(id=card_id)
+    return render(request, template_name='card.html', context={
+        'card_item': card_item
+    })

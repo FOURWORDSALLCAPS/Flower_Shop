@@ -150,7 +150,7 @@ margin-bottom: 50px;
 .banner__img {
 /*	width: 794px;
 height: 825px;*/
-left: 47%;
+left: 65%;
 /*top: -38px;*/
 bottom: 0;
 	position: absolute;
@@ -170,15 +170,17 @@ bottom: 0;
 .recommended__block:last-child {
 	margin-right: 0;
 }
+
 .recommended__elms {
   display: flex;
   flex-wrap: wrap;
 }
+
 .recommended__block_elms {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: calc(100% / 3);
+  width: calc(99% / 3);
 }
 
 .recommended__block_intro {
@@ -197,10 +199,9 @@ bottom: 0;
   padding: 5px;
 }
 
-
 .recommended__block_img {
-  width: 100%;
-  height: auto;
+  width: 550px;
+  height: 450px;
 }
 .recommended__btn {
 	width: 100%;
@@ -350,13 +351,14 @@ opacity: 0.3;
 }
 .card__block_first {
 	width: 602px;
+	height: 600px;
 }
 .card__block_sec {
 	width: 499px;
 }
 .card__img {
 	width: 100%;
-	height: 600px;
+	height: auto;
 }
 .card__block_price {
 	font-weight: 300;
