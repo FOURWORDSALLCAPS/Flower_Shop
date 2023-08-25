@@ -2,7 +2,7 @@ import random
 
 from django.shortcuts import render, redirect, get_object_or_404
 
-from order.models import CatalogFlower, Order, Florist, Client
+from order.models import CatalogFlower, Order, Florist, Client, Consultation
 
 
 def view_index(request):
@@ -105,3 +105,23 @@ def process_payment(request):
         return redirect('/')
 
     return redirect('/order_step/')
+
+
+def consultation_post(request):
+    if request.method == "POST":
+        serializer_client = ClientSerializer(data=request.POST)
+        if not serializer_client.is_valid():
+            return JsonResponse(serializer_client.errors, status=400)
+        validated_data = serializer_client.validated_data
+        client, client_created = Client.objects.get_or_create(
+            phone=validated_data['phone'],
+            defaults={'firstname': validated_data['firstname']}
+        )
+        if not client_created and client.firstname != validated_data['firstname']:
+            client.firstname = validated_data['firstname']
+            client.save()
+        Consultation.objects.get_or_create(
+            client=client,
+            florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
+        )
+        return redirect('/')

@@ -54,7 +54,7 @@
 						<form action="/order/" method="post">
 						  {% csrf_token %}
 						  <input type="hidden" name="item_id" value="{{ item.id }}">
-						  <button class="btn largeBtn card__btn" onclick="window.location.href='/order'">Заказать букет</button>
+						  <button class="btn largeBtn card__btn">Заказать букет</button>
 						</form>
 					</div>
 				{% endfor %}
@@ -65,9 +65,10 @@
 		<div class="container">
 			<div class="consultation">
 				<div class="title consultation__title">Оставьте заявку на консультацию</div>
-				<form action="#" class="consultation__form">
-					<input type="text" name="fname" class="consultation__form_input" placeholder="Введите Имя" required>
-					<input type="text" name="tel" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
+				<form action="/consultation_post/" method="post" class="consultation__form">
+					{% csrf_token %}
+					<input type="text" name="firstname" class="consultation__form_input" placeholder="Введите Имя" required>
+					<input type="text" name="phone" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
 					<button type="submit" class="consultation__form_btn" onclick="window.location.href='/consultation'">Отправить</button>
 				</form>
 			</div>

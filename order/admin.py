@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import CatalogFlower, Client, Category, Florist, Consultation, Order
@@ -37,7 +38,16 @@ class ClientAdmin(admin.ModelAdmin):
         'firstname',
         'phone',
         'email',
+        'link_to_orders_and_consultations',
     ]
+
+    def link_to_orders_and_consultations(self, obj):
+        url_orders = reverse("admin:order_order_changelist") + f'?client__id__exact={obj.id}'
+        url_consultations = reverse("admin:order_consultation_changelist") + f'?client__id__exact={obj.id}'
+        return format_html('{} | <a href="{}">Заказы</a> | <a href="{}">Консультации</a>', obj.phone, url_orders,
+                           url_consultations)
+
+    link_to_orders_and_consultations.short_description = 'Телефон'
 
 
 @admin.register(Category)

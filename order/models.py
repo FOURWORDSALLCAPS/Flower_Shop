@@ -66,7 +66,7 @@ class Consultation(models.Model):
         Client,
         verbose_name='Клиент',
         related_name='clients',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         blank=True,
         null=True
     )
@@ -105,7 +105,7 @@ class Order(models.Model):
         DELIVERED = 'Доставляется', 'Доставляется'
         ACCEPT = 'Доставлен', 'Доставлен'
 
-    client = models.ForeignKey(Client, verbose_name='Клиент', on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey(Client, verbose_name='Клиент', on_delete=models.CASCADE, null=True)
     flower = models.ForeignKey(CatalogFlower, verbose_name='Букет', on_delete=models.SET_NULL, null=True)
     florist = models.ForeignKey(Florist, verbose_name='Флорист', on_delete=models.SET_NULL, null=True)
     address = models.TextField('Адрес', max_length=100)
