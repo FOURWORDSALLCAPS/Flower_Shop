@@ -1,6 +1,8 @@
 import random
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from .serializers import OrderSerializer, PaymnetSerializer, ClientSerializer
 
 from order.models import CatalogFlower, Order, Florist, Client, Consultation
 
@@ -36,14 +38,14 @@ def view_order(request):
 
 def view_order_step(request):
     if request.method == "POST":
-        firstname = request.POST.get('firstname')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
-        order_time = request.POST.get('orderTime')
-        item_id = request.POST.get('item_id')
-        item = CatalogFlower.objects.filter(pk=item_id).first()
+        serializer_order = OrderSerializer(data=request.POST)
+        if not serializer_order.is_valid():
+            return JsonResponse(serializer_order.errors, status=400)
+        validated_data = serializer_order.validated_data
+        firstname = validated_data['firstname']
+        item = CatalogFlower.objects.filter(pk=validated_data['item_id']).first()
         client, client_created = Client.objects.get_or_create(
-            phone=phone, defaults={'firstname': firstname}
+            phone=validated_data['phone'], defaults={'firstname': firstname}
         )
         if not client_created and client.firstname != firstname:
             client.firstname = firstname
@@ -52,8 +54,8 @@ def view_order_step(request):
             client=client,
             flower=item,
             florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
-            address=address,
-            delivery_time=order_time,
+            address=validated_data['address'],
+            delivery_time=validated_data['delivery_time'],
         )
         return render(request, 'order-step.html', {'order': order})
 
@@ -98,6 +100,9 @@ def view_card(request, card_id):
 
 def process_payment(request):
     if request.method == "POST":
+        serializer_payment = PaymnetSerializer(data=request.POST)
+        if not serializer_payment.is_valid():
+            return JsonResponse(serializer_payment.errors, status=400)
         order_id = request.POST.get('order_id')
         order = get_object_or_404(Order, id=order_id)
         order.status = "Оплачено"
