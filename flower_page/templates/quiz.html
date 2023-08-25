@@ -26,16 +26,19 @@
 		<div class="container">
 			<div class="quiz">
 				<div class="quiz__back ">
-					<a href="#" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
+					<a href="/" class="quiz__back_link fic"><img src="{% static 'img/arrow-left.svg' %}" alt="arrow-left" class="arrowLeft">
 					<span class="quiz__back_intro">Назад</span></a>
 				</div>
 				<div class="quiz__block">
 					<h1 class="quiz__title">К какому событию нужен букет?</h1>
-					<div class="quiz__elems fic">
-						<button class="quiz__elem" onclick="window.location.href='/quiz_step'">Свадьба</button>
-						<button class="quiz__elem" onclick="window.location.href='/quiz_step'">День рождения</button>
-						<button class="quiz__elem" onclick="window.location.href='/quiz_step'">Без повода</button>
-					</div>
+					<form action="/quiz_step/" method="post" class="order__form">
+					  {% csrf_token %}
+					  <div class="quiz__elems fic">
+						<button class="quiz__elem" name="button_quiz" value="Свадьба">Свадьба</button>
+						<button class="quiz__elem" name="button_quiz" value="День рождения">День рождения</button>
+						<button class="quiz__elem" name="button_quiz" value="Без повода">Без повода</button>
+					  </div>
+					</form>
 					<div class="quiz__progress">
 						<div class="quiz__progress_step">
 							<span class="quiz__progress_num">1</span>
@@ -47,7 +50,6 @@
 						</div>
 					</div>
 				</div>
-				
 			</div>
 		</div>
 	</section>
