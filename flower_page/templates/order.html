@@ -28,11 +28,13 @@
 				<div class="order__block">
 					<div class="order_items">
 						<div class="title">Оформление доставки</div>
-						<form action="#" class="order__form">
+						<form action="/order_step/" method="post" class="order__form">
+							 <input type="hidden" name="item_id" value="{{ item.id }}">
+								{% csrf_token %}
 							<div class="order__form_block ficb">
-								<input type="text" name="fname" class="order__form_input" placeholder="Введите Имя" required>
-								<input type="text" name="tel" class="order__form_input" placeholder="+ 7 (999) 000 00 00" required>
-								<input type="text" name="adres" class="order__form_input" placeholder="Адрес доставки" required>
+								<input type="text" name="firstname" class="order__form_input" placeholder="Введите Имя" required>
+								<input type="text" name="phone" class="order__form_input" placeholder="+ 7 (999) 000 00 00" required>
+								<input type="text" name="address" class="order__form_input" placeholder="Адрес доставки" required>
 							</div>
 							<div class="order__form_btns fic">
 								<div class="order__form_radioBlock ">
@@ -59,16 +61,14 @@
 									<input type="radio" name="orderTime" id="radio6" value="с 18:00 до 20:00" class="order__form_radio" />
 									<label for="radio6" class="radioLable">с 18:00 до 20:00</label>
 								</div>
-								
 							</div>
 							<div class="order__form_line"></div>
 							<div class="order__form_btns ficb">
-								<button class="btn order__form_pay" onclick="window.location.href='/order_step'">Оплатить</button>
-								<button class="btn order__form_btn" onclick="window.history.back()">Назад</button>
+								  <button class="btn order__form_pay" onclick="window.location.href='/order_step'">Оплатить</button>
+								  <button class="btn order__form_btn" onclick="window.history.back()">Назад</button>
 							</div>
 						</form>
 					</div>
-					
 				</div>
 			</div>
 		</div>

@@ -28,13 +28,17 @@
 		  <div class="title">Рекомендуем</div>
 		  <div class="recommended__elms ficb">
 			{% for item in catalog_items %}
-			<div class="recommended__block_elms ficb">
-				 <a href="/card/{{ item.id }}">
-			  <span class="recommended__block_intro">{{ item.title }}</span>
-			  <span class="recommended__block_price">{{ item.price }} руб</span>
-			  <img src="{{ item.image.url }}" alt="{{ item.title }}" class="recommended__block_img">
-				 </a>
-			</div>
+			  <div class="recommended__block_elms ficb">
+			    <form action="/order/" method="post">
+			     {% csrf_token %}
+			    <input type="hidden" name="item_id" value="{{ item.id }}">
+			    </form>
+				  <a href="/card/{{ item.id }}">
+			    <span class="recommended__block_intro">{{ item.title }}</span>
+			    <span class="recommended__block_price">{{ item.price }} руб</span>
+			    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="recommended__block_img">
+				  </a>
+			  </div>
 			{% endfor %}
 		  </div>
 		</div>

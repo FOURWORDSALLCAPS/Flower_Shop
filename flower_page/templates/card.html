@@ -51,7 +51,11 @@
 								</span>
 							</div>
 						</div>
-						<button class="btn largeBtn card__btn" onclick="window.location.href='/order'">Заказать букет</button>
+						<form action="/order/" method="post">
+						  {% csrf_token %}
+						  <input type="hidden" name="item_id" value="{{ item.id }}">
+						  <button class="btn largeBtn card__btn" onclick="window.location.href='/order'">Заказать букет</button>
+						</form>
 					</div>
 				{% endfor %}
 			</div>
