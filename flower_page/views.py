@@ -1,13 +1,15 @@
 import random
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from .serializers import OrderSerializer, PaymnetSerializer, ClientSerializer
+from django.http import JsonResponse, HttpResponse
+from django.db import DatabaseError, OperationalError
+from .serializers import OrderSerializer, PaymentSerializer, ClientSerializer
+from django.db.models import F
 
 from order.models import CatalogFlower, Order, Florist, Client, Consultation
 
 
-def view_index(request):
+def view_index(request) -> HttpResponse:
     recommendation_items = CatalogFlower.objects.filter().order_by('pk')[:3]
 
     return render(request, template_name='index.html', context={
@@ -15,92 +17,103 @@ def view_index(request):
     })
 
 
-def view_catalog(request):
+def view_catalog(request) -> HttpResponse:
     catalog_items = CatalogFlower.objects.all()
-
+    if len(catalog_items) % 3 != 0:
+        catalog_items = catalog_items[:9]
     return render(request, template_name='catalog.html', context={
         'catalog_items': catalog_items
     })
 
 
-def view_consultation(request):
+def view_consultation(request) -> HttpResponse:
     return render(request, template_name='consultation.html')
 
 
-def view_order(request):
+def view_order(request) -> HttpResponse:
     item_id = request.POST.get('item_id')
     if item_id:
-        item = CatalogFlower.objects.get(pk=item_id)
+        item = CatalogFlower.objects.filter(pk=item_id).first()
         return render(request, 'order.html', {'item': item})
     else:
         return redirect('/catalog')
 
 
-def view_order_step(request):
+def view_order_step(request) -> HttpResponse:
     if request.method == "POST":
         serializer_order = OrderSerializer(data=request.POST)
         if not serializer_order.is_valid():
             return JsonResponse(serializer_order.errors, status=400)
+
         validated_data = serializer_order.validated_data
         firstname = validated_data['firstname']
         item = CatalogFlower.objects.filter(pk=validated_data['item_id']).first()
-        client, client_created = Client.objects.get_or_create(
-            phone=validated_data['phone'], defaults={'firstname': firstname}
-        )
-        if not client_created and client.firstname != firstname:
-            client.firstname = firstname
-            client.save()
-        order, created = Order.objects.get_or_create(
-            client=client,
-            flower=item,
-            florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
-            address=validated_data['address'],
-            delivery_time=validated_data['delivery_time'],
-        )
+        try:
+            client, client_created = Client.objects.get_or_create(
+                phone=validated_data['phone'], defaults={'firstname': firstname}
+            )
+
+            if not client_created and client.firstname != firstname:
+                client.update(firstname=F(firstname))
+
+            order, created = Order.objects.get_or_create(
+                client=client,
+                flower=item,
+                florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
+                address=validated_data['address'],
+                delivery_time=validated_data['delivery_time'],
+            )
+            if created:
+                pass  # TODO Заглушка для вывода окна True о создании заказа на фронтенд для пользователя!
+        except (DatabaseError, OperationalError) as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
         return render(request, 'order-step.html', {'order': order})
 
     return render(request, 'order.html')
 
 
-def view_quiz(request):
+def view_quiz(request) -> HttpResponse:
     return render(request, template_name='quiz.html')
 
 
-def view_quiz_step(request):
+def view_quiz_step(request) -> HttpResponse:
     if request.method == "POST":
         quiz_category = request.POST.get("button_quiz")
-        request.session['quiz_category'] = quiz_category
+        if quiz_category is not None:
+            request.session['quiz_category'] = quiz_category
     return render(request, template_name='quiz-step.html')
 
 
-def view_result(request):
+def view_result(request) -> HttpResponse:
     if request.method == "POST":
         quiz_price_range = request.POST.get("button_quiz_step")
         quiz_category = request.session.get('quiz_category')
-        if quiz_price_range == '1000':
-            card_item = CatalogFlower.objects.filter(category__title=quiz_category, price__lt=quiz_price_range)[:3]
-        elif quiz_price_range == '1001':
-            card_item = CatalogFlower.objects.filter(category__title=quiz_category, price__gt=quiz_price_range, price__lt='5000')[:3]
-        elif quiz_price_range == '5000':
-            card_item = CatalogFlower.objects.filter(category__title=quiz_category, price__gt=quiz_price_range)[:3]
+        price_ranges = {
+            '1000': {'price__lt': '1000'},
+            '1001': {'price__gt': '1000', 'price__lt': '5000'},
+            '5000': {'price__gt': '5000'},
+        }
+        if quiz_price_range in price_ranges:
+            filters = price_ranges[quiz_price_range]
+            filters['category__title'] = quiz_category
+            card_item = CatalogFlower.objects.filter(**filters)[:3]
         else:
-            card_item = CatalogFlower.objects.filter().order_by()[:3]
-        return render(request, template_name='result.html', context={
-            'card_item': card_item
-        })
+            card_item = CatalogFlower.objects.all()[:3]
+        return render(request, template_name='result.html', context={'card_item': card_item})
     return redirect('/')
 
 
-def view_card(request, card_id):
+def view_card(request, card_id) -> HttpResponse:
     card_item = CatalogFlower.objects.filter(id=card_id)
     return render(request, template_name='card.html', context={
         'card_item': card_item
     })
 
 
-def process_payment(request):
+def process_payment(request) -> HttpResponse:
     if request.method == "POST":
-        serializer_payment = PaymnetSerializer(data=request.POST)
+        serializer_payment = PaymentSerializer(data=request.POST)
         if not serializer_payment.is_valid():
             return JsonResponse(serializer_payment.errors, status=400)
         order_id = request.POST.get('order_id')
@@ -112,21 +125,26 @@ def process_payment(request):
     return redirect('/order_step/')
 
 
-def consultation_post(request):
+def consultation_post(request) -> HttpResponse:
     if request.method == "POST":
         serializer_client = ClientSerializer(data=request.POST)
         if not serializer_client.is_valid():
             return JsonResponse(serializer_client.errors, status=400)
         validated_data = serializer_client.validated_data
-        client, client_created = Client.objects.get_or_create(
-            phone=validated_data['phone'],
-            defaults={'firstname': validated_data['firstname']}
-        )
-        if not client_created and client.firstname != validated_data['firstname']:
-            client.firstname = validated_data['firstname']
-            client.save()
-        Consultation.objects.get_or_create(
-            client=client,
-            florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
-        )
+        firstname = validated_data['firstname']
+        try:
+            client, created = Client.objects.get_or_create(
+                phone=validated_data['phone'],
+                defaults={'firstname': firstname}
+            )
+            if not created and client.firstname != firstname:
+                client.update(firstname=F(firstname))
+            consultation, client_created = Consultation.objects.get_or_create(
+                client=client,
+                florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
+            )
+            if client_created:
+                pass  # TODO Заглушка для вывода окна True о создании заказа на фронтенд для пользователя!
+        except (DatabaseError, OperationalError) as e:
+            return JsonResponse({'error': str(e)}, status=500)
         return redirect('/')

@@ -25,7 +25,7 @@ class OrderSerializer(serializers.Serializer):
     item_id = serializers.IntegerField()
 
 
-class PaymnetSerializer(serializers.Serializer):
+class PaymentSerializer(serializers.Serializer):
     card_number = serializers.CharField(
         validators=[RegexValidator(
             regex=r'^\d{16}$',
@@ -40,7 +40,7 @@ class PaymnetSerializer(serializers.Serializer):
     )
     card_gg = serializers.CharField(
         validators=[RegexValidator(
-            regex=r'^(2[3-9]|[3-9][0-9])$',
+            regex=r'^(2[0-9][0-9][0-9])$',
             message="Year must be entered in the format: '2023' to '2099'."
         )]
     )

@@ -25,46 +25,50 @@
 	<section id="result">
 		<div class="container">
 			<div class="result p100">
+				{% if card_item %}
 				<div class="title">Мы подобрали специально для Вас</div>
-				  {% for item in card_item %}
-					<div class="result__block ficb">
-						<div class="result__elems">
-							<div class="card__elems ">
-								<span class="card__elems_intro">Описание:</span>
-								<div class="card__items">
-									<p class="card__items_text card__items_text__first">
-										{{ item.description }}
-									</p>
-								</div>
-							</div>
-							<div class="card__elems ">
-								<span class="card__elems_intro">Состав:</span>
-								<div class="card__items">
-									<p class="card__items_text card__items_text__first">
-										{{ item.bouquet_composition }}
-									</p>
-
-								</div>
+				{% else %}
+				<div class="title">К сожалению букеты по заданным рекомендациям отсутствуют...</div>
+				{% endif %}
+				{% for item in card_item %}
+				<div class="result__block ficb">
+					<div class="result__elems">
+						<div class="card__elems ">
+							<span class="card__elems_intro">Описание:</span>
+							<div class="card__items">
+								<p class="card__items_text card__items_text__first">
+									{{ item.description }}
+								</p>
 							</div>
 						</div>
-						<img src="{{ item.image.url }}" alt="{{ item.title }}" class="result__block_img">
-						<div class="result__items">
-							<div class="title result__items_title">{{ item.title }}</div>
-							<div class="result__items_price">{{ item.price }}</div>
-							<form action="/order/" method="post">
-								 {% csrf_token %}
-								<input type="hidden" name="item_id" value="{{ item.id }}">
-								<button class="btn result__items_btn" onclick="window.location.href='/order'">Заказать букет</button>
-							</form>
-							<hr class="result__items_line" />
-							<div class="result__items_intro">Хотите что-то более специальное?</div>
-							<div class="result__items_block">
-								<button class="btn largeBtn result__items_block__btn" onclick="window.location.href='/catalog'">Смотреть всю коллекцию</button>
-								<button class="btn largeBtn result__items_block__btn" onclick="window.location.href='/consultation'">Заказать консультацию</button>
+						<div class="card__elems ">
+							<span class="card__elems_intro">Состав:</span>
+							<div class="card__items">
+								<p class="card__items_text card__items_text__first">
+									{{ item.bouquet_composition }}
+								</p>
+
 							</div>
 						</div>
 					</div>
-				  {% endfor %}
+					<img src="{{ item.image.url }}" alt="{{ item.title }}" class="result__block_img">
+					<div class="result__items">
+						<div class="title result__items_title">{{ item.title }}</div>
+						<div class="result__items_price">{{ item.price }}</div>
+						<form action="/order/" method="post">
+							 {% csrf_token %}
+							<input type="hidden" name="item_id" value="{{ item.id }}">
+							<button class="btn result__items_btn" onclick="window.location.href='/order'">Заказать букет</button>
+						</form>
+						<hr class="result__items_line" />
+						<div class="result__items_intro">Хотите что-то более специальное?</div>
+						<div class="result__items_block">
+							<button class="btn largeBtn result__items_block__btn" onclick="window.location.href='/catalog'">Смотреть всю коллекцию</button>
+							<button class="btn largeBtn result__items_block__btn" onclick="window.location.href='/consultation'">Заказать консультацию</button>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
 			</div>
 		</div>
 	</section>
@@ -103,7 +107,7 @@
 				<form action="/consultation_post/" method="post" class="consultation__form">
 					{% csrf_token %}
 					<input type="text" name="firstname" class="consultation__form_input" placeholder="Введите Имя" required>
-					<input type="text" name="phone" class="consultation__form_input" placeholder="+ 7 (999) 000 00 00" required>
+					<input type="text" name="phone" class="consultation__form_input" placeholder="+79990000000" required>
 					<button type="submit" class="consultation__form_btn" onclick="window.location.href='/consultation'">Отправить</button>
 				</form>
 			</div>
