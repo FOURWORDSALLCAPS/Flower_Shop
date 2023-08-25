@@ -51,7 +51,11 @@
 						<div class="result__items">
 							<div class="title result__items_title">{{ item.title }}</div>
 							<div class="result__items_price">{{ item.price }}</div>
-							<button class="btn result__items_btn" onclick="window.location.href='/order'">Заказать букет</button>
+							<form action="/order/" method="post">
+								 {% csrf_token %}
+								<input type="hidden" name="item_id" value="{{ item.id }}">
+								<button class="btn result__items_btn" onclick="window.location.href='/order'">Заказать букет</button>
+							</form>
 							<hr class="result__items_line" />
 							<div class="result__items_intro">Хотите что-то более специальное?</div>
 							<div class="result__items_block">
