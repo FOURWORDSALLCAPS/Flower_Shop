@@ -1,7 +1,27 @@
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
+from django.db.models import Sum
+from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import CatalogFlower, Client, Category, Florist, Consultation, Order, Payment
+from .models import CatalogFlower, Client, Category, Florist, Consultation, Order
+
+
+class TotalOrdersFilter(SimpleListFilter):
+    title = 'Статистика'
+    parameter_name = 'total_orders'
+
+    def lookups(self, request, model_admin):
+        total_orders = Order.objects.count()
+        total_sum = Order.objects.aggregate(sum=Sum('flower__price'))['sum']
+        return [
+            ('orders', f'Всего заказов: {total_orders}'),
+            ('sum', f'Общая сумма заказов: {total_sum}'),
+        ]
+
+    def queryset(self, request, queryset):
+        return queryset
+
 
 
 @admin.register(CatalogFlower)
@@ -37,7 +57,16 @@ class ClientAdmin(admin.ModelAdmin):
         'firstname',
         'phone',
         'email',
+        'link_to_orders_and_consultations',
     ]
+
+    def link_to_orders_and_consultations(self, obj):
+        url_orders = reverse("admin:order_order_changelist") + f'?client__id__exact={obj.id}'
+        url_consultations = reverse("admin:order_consultation_changelist") + f'?client__id__exact={obj.id}'
+        return format_html('{} | <a href="{}">Заказы</a> | <a href="{}">Консультации</a>', obj.phone, url_orders,
+                           url_consultations)
+
+    link_to_orders_and_consultations.short_description = 'Телефон'
 
 
 @admin.register(Category)
@@ -78,6 +107,8 @@ class OrderAdmin(admin.ModelAdmin):
         'get_total_price'
     ]
 
+    list_filter = [TotalOrdersFilter]
+
     fields = [
         'client',
         'flower',
@@ -101,8 +132,3 @@ class OrderAdmin(admin.ModelAdmin):
             return obj.flower.price
 
     get_total_price.short_description = 'Итоговая стоимость'
-
-
-@admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
-    pass
