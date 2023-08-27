@@ -5,3 +5,4 @@ django-phonenumber-field[phonenumbers]==6.3.0
 Pillow==10.0.0
 dj-database-url==2.1.0
 djangorestframework~=3.14.0
+stripe==6.1.0
