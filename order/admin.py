@@ -23,6 +23,7 @@ class TotalOrdersFilter(SimpleListFilter):
         return queryset
 
 
+
 @admin.register(CatalogFlower)
 class CatalogFlowerAdmin(admin.ModelAdmin):
     list_display = [

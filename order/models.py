@@ -31,6 +31,7 @@ class CatalogFlower(models.Model):
     category = models.ManyToManyField('Category', verbose_name='Категория')
     price = models.DecimalField('Цена', max_digits=8, decimal_places=2, db_index=True, validators=[MinValueValidator(0)])
 
+
     class Meta:
         verbose_name = 'букет'
         verbose_name_plural = 'букеты'
@@ -97,6 +98,7 @@ class Order(models.Model):
         ('с 14:00 до 16:00', 'с 14:00 до 16:00'),
         ('с 16:00 до 18:00', 'с 16:00 до 18:00'),
         ('с 18:00 до 20:00', 'с 18:00 до 20:00'),
+
     )
 
     class ChoicesStatus(models.TextChoices):
@@ -111,6 +113,7 @@ class Order(models.Model):
     address = models.TextField('Адрес', max_length=100)
     delivery_time = models.CharField('Время доставки', max_length=50, choices=TIME_CHOICES)
     status = models.CharField('Статус заказа', max_length=50, choices=ChoicesStatus.choices, default=ChoicesStatus.NEW, db_index=True)
+
 
     class Meta:
         verbose_name = 'Заказ'
