@@ -1,8 +1,26 @@
 from django.contrib import admin
+from django.contrib.admin import SimpleListFilter
+from django.db.models import Sum
 from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import CatalogFlower, Client, Category, Florist, Consultation, Order
+
+
+class TotalOrdersFilter(SimpleListFilter):
+    title = 'Статистика'
+    parameter_name = 'total_orders'
+
+    def lookups(self, request, model_admin):
+        total_orders = Order.objects.count()
+        total_sum = Order.objects.aggregate(sum=Sum('flower__price'))['sum']
+        return [
+            ('orders', f'Всего заказов: {total_orders}'),
+            ('sum', f'Общая сумма заказов: {total_sum}'),
+        ]
+
+    def queryset(self, request, queryset):
+        return queryset
 
 
 @admin.register(CatalogFlower)
@@ -87,6 +105,8 @@ class OrderAdmin(admin.ModelAdmin):
         'status',
         'get_total_price'
     ]
+
+    list_filter = [TotalOrdersFilter]
 
     fields = [
         'client',
