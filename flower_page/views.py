@@ -1,5 +1,7 @@
 import random
+import stripe
 
+from environs import Env
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.db import DatabaseError, OperationalError
@@ -111,18 +113,48 @@ def view_card(request, card_id) -> HttpResponse:
     })
 
 
+def make_payment(card_number, exp_month, exp_year, cvc):
+    env = Env()
+    env.read_env()
+    stripe.api_key = env('STRIPE_API_KEY')
+    try:
+        token = stripe.Token.create(
+            card={
+                'number': card_number,
+                'exp_month': exp_month,
+                'exp_year': exp_year,
+                'cvc': cvc
+            }
+        )
+        charge = stripe.Charge.create(
+            amount=1000,
+            currency='usd',
+            source=token.id
+        )
+        if charge.paid:
+            return True
+    except stripe.error.CardError as e:
+        return e
+    except stripe.error.StripeError as e:
+        return e
+
+
 def process_payment(request) -> HttpResponse:
     if request.method == "POST":
         serializer_payment = PaymentSerializer(data=request.POST)
         if not serializer_payment.is_valid():
             return JsonResponse(serializer_payment.errors, status=400)
-        order_id = request.POST.get('order_id')
-        order = get_object_or_404(Order, id=order_id)
-        order.status = "Оплачено"
-        order.save()
-        return redirect('/')
+        card_number = request.POST.get('card_number')
+        exp_month = request.POST.get('card_mm')
+        exp_year = request.POST.get('card_gg')
+        cvc = request.POST.get('card_cvc')
+        if make_payment(card_number, exp_month, exp_year, cvc):
+            order_id = request.POST.get('order_id')
+            order = get_object_or_404(Order, id=order_id)
+            order.status = "Оплачено"
+            order.save()
+            return redirect('/')
 
-    return redirect('/order_step/')
 
 
 def consultation_post(request) -> HttpResponse:
