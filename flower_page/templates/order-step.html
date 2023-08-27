@@ -27,7 +27,13 @@
 			<div class="order orderStep">
 				<div class="order__block">
 					<div class="order_items">
-						<div class="title">Оплата</div>
+						{% if messages %}
+							{% for message in messages %}
+								<div class="title">{{ message }}</div>
+							{% endfor %}
+						{% else %}
+							<div class="title">Оплата</div>
+						{% endif %}
 							<form action="/process_payment/" method="post" class="order__form orderStep_form">
 								{% csrf_token %}
 								<div class="order__form_block">
@@ -48,7 +54,7 @@
 								</div>
 							<div class="order__form_line"></div>
 							<div class="order__form_btns ficb">
-								<input type="hidden" name="order_id" value="{{ order.id }}">
+								<input type="hidden" name="order_id" value="{{ order_id }}">
 								<button class="btn order__form_pay">Оплатить</button>
 								<button class="btn order__form_btn">Назад</button>
 							</div>

@@ -27,7 +27,13 @@
 			<div class="order">
 				<div class="order__block">
 					<div class="order_items">
-						<div class="title">Оформление доставки</div>
+						{% if messages %}
+							{% for message in messages %}
+								<div class="title">{{ message }}</div>
+							{% endfor %}
+						{% else %}
+							<div class="title">Оформление доставки</div>
+						{% endif %}
 						<form action="/order_step/" method="post" class="order__form">
 							 <input type="hidden" name="item_id" value="{{ item.id }}">
 								{% csrf_token %}

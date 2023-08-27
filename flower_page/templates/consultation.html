@@ -27,7 +27,13 @@
 			<div class="singUpConsultation">
 				<form action="/consultation_post/" method="post" class="singUpConsultation__form">
 					{% csrf_token %}
-					<div class="title">Запись на консультацию</div>		
+					{% if messages %}
+						{% for message in messages %}
+							<div class="title">{{ message }}</div>
+						{% endfor %}
+					{% else %}
+						<div class="title">Запись на консультацию</div>
+					{% endif %}
 					<input type="text" name="firstname" class="order__form_input" placeholder="Введите Имя" required>
 					<input type="text" name="phone" class="order__form_input" placeholder="+79990000000" required>
 					<div class="chekbox fic">

@@ -2,6 +2,7 @@ import random
 import stripe
 
 from environs import Env
+from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.db import DatabaseError, OperationalError
@@ -45,32 +46,32 @@ def view_order_step(request) -> HttpResponse:
     if request.method == "POST":
         serializer_order = OrderSerializer(data=request.POST)
         if not serializer_order.is_valid():
-            return JsonResponse(serializer_order.errors, status=400)
+            messages.error(request, 'Проверьте корректность вводимых данных')
+        else:
+            validated_data = serializer_order.validated_data
+            firstname = validated_data['firstname']
+            item = CatalogFlower.objects.filter(pk=validated_data['item_id']).first()
+            try:
+                client, client_created = Client.objects.get_or_create(
+                    phone=validated_data['phone'], defaults={'firstname': firstname}
+                )
 
-        validated_data = serializer_order.validated_data
-        firstname = validated_data['firstname']
-        item = CatalogFlower.objects.filter(pk=validated_data['item_id']).first()
-        try:
-            client, client_created = Client.objects.get_or_create(
-                phone=validated_data['phone'], defaults={'firstname': firstname}
-            )
+                if not client_created and client.firstname != firstname:
+                    client.update(firstname=F(firstname))
 
-            if not client_created and client.firstname != firstname:
-                client.update(firstname=F(firstname))
+                order, created = Order.objects.get_or_create(
+                    client=client,
+                    flower=item,
+                    florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
+                    address=validated_data['address'],
+                    delivery_time=validated_data['delivery_time'],
+                )
+                if created:
+                    pass  # TODO Заглушка для вывода окна об успешном создании заказа!
+            except (DatabaseError, OperationalError) as e:
+                return JsonResponse({'error': str(e)}, status=500)
 
-            order, created = Order.objects.get_or_create(
-                client=client,
-                flower=item,
-                florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
-                address=validated_data['address'],
-                delivery_time=validated_data['delivery_time'],
-            )
-            if created:
-                pass  # TODO Заглушка для вывода окна True о создании заказа на фронтенд для пользователя!
-        except (DatabaseError, OperationalError) as e:
-            return JsonResponse({'error': str(e)}, status=500)
-
-        return render(request, 'order-step.html', {'order': order})
+            return render(request, 'order-step.html', {'order_id': order.id})
 
     return render(request, 'order.html')
 
@@ -103,7 +104,6 @@ def view_result(request) -> HttpResponse:
         else:
             card_item = CatalogFlower.objects.all()[:3]
         return render(request, template_name='result.html', context={'card_item': card_item})
-    return redirect('/')
 
 
 def view_card(request, card_id) -> HttpResponse:
@@ -134,49 +134,52 @@ def make_payment(card_number, exp_month, exp_year, cvc):
         if charge.paid:
             return True
     except stripe.error.CardError as e:
-        return e
+        return False
     except stripe.error.StripeError as e:
-        return e
+        return False
 
 
 def process_payment(request) -> HttpResponse:
     if request.method == "POST":
+        order_id = request.POST.get('order_id')
         serializer_payment = PaymentSerializer(data=request.POST)
         if not serializer_payment.is_valid():
-            return JsonResponse(serializer_payment.errors, status=400)
-        card_number = request.POST.get('card_number')
-        exp_month = request.POST.get('card_mm')
-        exp_year = request.POST.get('card_gg')
-        cvc = request.POST.get('card_cvc')
-        if make_payment(card_number, exp_month, exp_year, cvc):
-            order_id = request.POST.get('order_id')
-            order = get_object_or_404(Order, id=order_id)
-            order.status = "Оплачено"
-            order.save()
-            return redirect('/')
-
+            messages.error(request, 'Проверьте корректность вводимых данных')
+            return render(request, 'order-step.html', {'order_id': order_id})
+        else:
+            card_number = request.POST.get('card_number')
+            exp_month = request.POST.get('card_mm')
+            exp_year = request.POST.get('card_gg')
+            cvc = request.POST.get('card_cvc')
+            if make_payment(card_number, exp_month, exp_year, cvc):
+                order = get_object_or_404(Order, id=order_id)
+                order.status = "Оплачено"
+                order.save()
+                # TODO Заглушка для вывода окна об успешной оплате заказа!
+                return redirect('/')
 
 
 def consultation_post(request) -> HttpResponse:
     if request.method == "POST":
         serializer_client = ClientSerializer(data=request.POST)
         if not serializer_client.is_valid():
-            return JsonResponse(serializer_client.errors, status=400)
-        validated_data = serializer_client.validated_data
-        firstname = validated_data['firstname']
-        try:
-            client, created = Client.objects.get_or_create(
-                phone=validated_data['phone'],
-                defaults={'firstname': firstname}
-            )
-            if not created and client.firstname != firstname:
-                client.update(firstname=F(firstname))
-            consultation, client_created = Consultation.objects.get_or_create(
-                client=client,
-                florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
-            )
-            if client_created:
-                pass  # TODO Заглушка для вывода окна True о создании заказа на фронтенд для пользователя!
-        except (DatabaseError, OperationalError) as e:
-            return JsonResponse({'error': str(e)}, status=500)
-        return redirect('/')
+            messages.error(request, 'Проверьте корректность вводимых данных')
+        else:
+            validated_data = serializer_client.validated_data
+            firstname = validated_data['firstname']
+            try:
+                client, created = Client.objects.get_or_create(
+                    phone=validated_data['phone'],
+                    defaults={'firstname': firstname}
+                )
+                if not created and client.firstname != firstname:
+                    client.update(firstname=F(firstname))
+                consultation, client_created = Consultation.objects.get_or_create(
+                    client=client,
+                    florist_id=random.choice(Florist.objects.values_list('id', flat=True)),
+                )
+                if client_created:
+                    pass  # TODO Заглушка для вывода окна об успешном создании консультации!
+            except (DatabaseError, OperationalError) as e:
+                return JsonResponse({'error': str(e)}, status=500)
+    return redirect('/#consultation')

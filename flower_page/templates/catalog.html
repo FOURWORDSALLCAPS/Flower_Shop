@@ -47,7 +47,13 @@
 	<section id="consultation">
 		<div class="container">
 			<div class="consultation">
-				<div class="title consultation__title">Оставьте заявку на консультацию</div>
+				{% if messages %}
+					{% for message in messages %}
+						<div class="title consultation__title">{{ message }}</div>
+					{% endfor %}
+				{% else %}
+					<div class="title consultation__title">Оставьте заявку на консультацию</div>
+				{% endif %}
 				<form action="/consultation_post/" method="post" class="consultation__form">
 					{% csrf_token %}
 					<input type="text" name="firstname" class="consultation__form_input" placeholder="Введите Имя" required>
