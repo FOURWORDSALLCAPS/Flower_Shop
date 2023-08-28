@@ -349,16 +349,13 @@ opacity: 0.3;
 	padding-top: 50px;
 	padding-bottom: 100px;	
 }
-.card__block_first {
-	width: 602px;
-	height: 600px;
-}
+
 .card__block_sec {
 	width: 499px;
 }
 .card__img {
-	width: 100%;
-	height: auto;
+	width: 602px;
+	height: 760px;
 }
 .card__block_price {
 	font-weight: 300;
