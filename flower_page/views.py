@@ -132,9 +132,9 @@ def make_payment(card_number, exp_month, exp_year, cvc):
         )
         if charge.paid:
             return True
-    except stripe.error.CardError as e:
+    except stripe.error.CardError:
         return False
-    except stripe.error.StripeError as e:
+    except stripe.error.StripeError:
         return False
 
 
