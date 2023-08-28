@@ -38,15 +38,16 @@ def view_order(request) -> HttpResponse:
     if item_id:
         item = CatalogFlower.objects.filter(pk=item_id).first()
         return render(request, 'order.html', {'item': item})
-    else:
-        return redirect('/catalog')
 
 
 def view_order_step(request) -> HttpResponse:
     if request.method == "POST":
+        item_id = request.POST.get('item_id')
+        item = CatalogFlower.objects.filter(pk=item_id).first()
         serializer_order = OrderSerializer(data=request.POST)
         if not serializer_order.is_valid():
             messages.error(request, 'Проверьте корректность вводимых данных')
+            return render(request, 'order.html', {'item': item})
         else:
             validated_data = serializer_order.validated_data
             firstname = validated_data['firstname']
@@ -72,8 +73,6 @@ def view_order_step(request) -> HttpResponse:
                 return JsonResponse({'error': str(e)}, status=500)
 
             return render(request, 'order-step.html', {'order_id': order.id})
-
-    return render(request, 'order.html')
 
 
 def view_quiz(request) -> HttpResponse:
