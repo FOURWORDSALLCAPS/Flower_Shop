@@ -12,12 +12,12 @@
 	<header id="header">
 		<div class="container">
 			<div class="header ficb">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+				<a href="/static"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
 				<nav>
 					<ul class="menu ficc">
 							<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
 							<li class="menu__item"><a href="/quiz" class="menu__item_link">Рекомендации</a></li>
-							<li class="menu__item"><a href="/#contacts" class="menu__item_link">Контакты</a></li>
+							<li class="menu__item"><a href="/static#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 			</div>
@@ -52,7 +52,7 @@
 								</span>
 							</div>
 						</div>
-						<form action="/order/" method="post">
+						<form action="/order" method="post">
 						  {% csrf_token %}
 						  <input type="hidden" name="item_id" value="{{ item.id }}">
 						  <button class="btn largeBtn card__btn">Заказать букет</button>
@@ -84,12 +84,12 @@
 	<footer id="footer">
 		<div class="container">
 			<div class="footer">
-				<a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
+				<a href="/static"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
 				<nav>
 					<ul class="menu footer__menu ficc">
 							<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
 							<li class="menu__item"><a href="/quiz" class="menu__item_link">Рекомендации</a></li>
-							<li class="menu__item"><a href="/#contacts" class="menu__item_link">Контакты</a></li>
+							<li class="menu__item"><a href="/static#contacts" class="menu__item_link">Контакты</a></li>
 					</ul>
 				</nav>
 				<hr class="line"></hr>

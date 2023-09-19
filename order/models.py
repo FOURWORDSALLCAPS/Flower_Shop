@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db import models
 
 
-def year_validator():
+def validate_year():
     current_year = datetime.now().year
     return MinValueValidator(current_year)
 
@@ -30,7 +30,6 @@ class CatalogFlower(models.Model):
     image = models.ImageField('Изображение')
     category = models.ManyToManyField('Category', verbose_name='Категория')
     price = models.DecimalField('Цена', max_digits=8, decimal_places=2, db_index=True, validators=[MinValueValidator(0)])
-
 
     class Meta:
         verbose_name = 'букет'
@@ -113,7 +112,6 @@ class Order(models.Model):
     address = models.TextField('Адрес', max_length=100)
     delivery_time = models.CharField('Время доставки', max_length=50, choices=TIME_CHOICES)
     status = models.CharField('Статус заказа', max_length=50, choices=ChoicesStatus.choices, default=ChoicesStatus.NEW, db_index=True)
-
 
     class Meta:
         verbose_name = 'Заказ'

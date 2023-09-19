@@ -1,0 +1,84 @@
+<!DOCTYPE html>{% load static %}
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Flower Shop</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+	<header id="header">
+		<div class="container">
+			<div class="header ficb">
+				<a href="/static"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo"></a>
+				<nav>
+					<ul class="menu ficc">
+						<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="/quiz" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="/static#contacts" class="menu__item_link">Контакты</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</header>
+	<section id="recommended">
+	  <div class="container">
+		<div class="recommended p100">
+		  <div class="title">Рекомендуем</div>
+		  <div class="recommended__elms ficb">
+			{% for item in catalog_items %}
+			  <div class="recommended__block_elms ficb">
+			    <form action="/order" method="post">
+			     {% csrf_token %}
+			    <input type="hidden" name="item_id" value="{{ item.id }}">
+			    </form>
+				  <a href="/card/{{ item.id }}">
+			    <span class="recommended__block_intro">{{ item.title }}</span>
+			    <span class="recommended__block_price">{{ item.price }} руб</span>
+			    <img src="{{ item.image.url }}" alt="{{ item.title }}" class="recommended__block_img">
+				  </a>
+			  </div>
+			{% endfor %}
+		  </div>
+		</div>
+	  </div>
+	</section>
+	<section id="consultation">
+		<div class="container">
+			<div class="consultation">
+				{% if messages %}
+					{% for message in messages %}
+						<div class="title consultation__title">{{ message }}</div>
+					{% endfor %}
+				{% else %}
+					<div class="title consultation__title">Оставьте заявку на консультацию</div>
+				{% endif %}
+				<form action="/consultation_post/" method="post" class="consultation__form">
+					{% csrf_token %}
+					<input type="text" name="firstname" class="consultation__form_input" placeholder="Введите Имя" required>
+					<input type="text" name="phone" class="consultation__form_input" placeholder="+79990000000" required>
+					<button type="submit" class="consultation__form_btn">Отправить</button>
+				</form>
+			</div>
+		</div>
+	</section>
+	<footer id="footer">
+		<div class="container">
+			<div class="footer">
+				<a href="/static"><img src="{% static 'img/logo.svg' %}" alt="logo" class="logo footer__logo"></a>
+				<nav>
+					<ul class="menu footer__menu ficc">
+						<li class="menu__item"><a href="/catalog" class="menu__item_link">Каталог</a></li>
+						<li class="menu__item"><a href="/quiz" class="menu__item_link">Рекомендации</a></li>
+						<li class="menu__item"><a href="/static#contacts" class="menu__item_link">Контакты</a></li>
+					</ul>
+				</nav>
+				<hr class="line"></hr>
+				<a href="https://rosstat.gov.ru/politika-konfidencialnosti" class="footer__poli">Политика конфиденциальности</a>
+				<p class="footer_cop">©️2023. FlowerShop. Все права защищены</p>
+			</div>
+		</div>
+	</footer>
+</body>
+</html>
